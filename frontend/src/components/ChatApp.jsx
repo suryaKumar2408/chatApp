@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import "./ChatApp.css"; // ✅ import CSS file here
+import "./ChatApp.css";
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
@@ -11,32 +11,50 @@ const ChatApp = () => {
     message: "",
   });
 
+  let stompClient = null;
+
+  // ✅ Connect only once
   useEffect(() => {
     connect();
+
+    // Cleanup connection on unmount
+    return () => {
+      if (window.stompClient) {
+        window.stompClient.deactivate();
+        window.stompClient = null;
+        setConnected(false);
+      }
+    };
   }, []);
 
-  let client = null;
-
   const connect = () => {
-    const socket = new SockJS("http://localhost:8080/chat");
+    const backendUrl = "https://chatapp-backend-n0tc.onrender.com"; // your Render backend URL
+    const socket = new SockJS(`${backendUrl}/chat`);
 
-    client = new Client({
+    stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       onConnect: () => {
         setConnected(true);
-        client.subscribe("/topic/messages", (msg) => {
+        console.log("Connected to backend ✅");
+
+        // Subscribe once to the topic
+        stompClient.subscribe("/topic/messages", (msg) => {
           const message = JSON.parse(msg.body);
           setMessages((prev) => [...prev, message]);
         });
+      },
+      onDisconnect: () => {
+        console.log("Disconnected ❌");
+        setConnected(false);
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
       },
     });
 
-    client.activate();
-    window.stompClient = client; // optional global for debugging
+    stompClient.activate();
+    window.stompClient = stompClient; // store globally to use in sendMessage
   };
 
   const handleInputChange = (e) => {
