@@ -6,7 +6,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = {"*"})
+@CrossOrigin(origins = { "http://localhost:3000",
+        "https://chat-app-pink-nine-28.vercel.app"})
 @Controller
 public class ChatController {
     @MessageMapping("/sendMessage")

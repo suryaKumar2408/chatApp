@@ -11,10 +11,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins( "https://chat-app-pink-nine-28.vercel.app", "http://localhost:3000")
                 .withSockJS();
-
     }
+
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
