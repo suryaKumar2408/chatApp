@@ -548,11 +548,13 @@
   align-self: flex-end;
   flex-direction: row;
   animation: slideInRight 0.3s ease both;
+  animation-delay: var(--msg-delay, 0s);
 }
 
 .message-row.other {
   align-self: flex-start;
   animation: slideInLeft 0.3s ease both;
+  animation-delay: var(--msg-delay, 0s);
 }
 
 /* Avatar */
@@ -569,6 +571,39 @@
   flex-shrink: 0;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Avatar color palette */
+.avatar-color-0 {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.avatar-color-1 {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.avatar-color-2 {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.avatar-color-3 {
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+.avatar-color-4 {
+  background: linear-gradient(135deg, #fa709a, #fee140);
+}
+
+.avatar-color-5 {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+}
+
+.avatar-color-6 {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+}
+
+.avatar-color-7 {
+  background: linear-gradient(135deg, #ff9a9e, #fecfef);
 }
 
 /* Message Bubble */

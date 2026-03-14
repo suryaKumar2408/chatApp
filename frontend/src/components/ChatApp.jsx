@@ -17,7 +17,7 @@ const ChatApp = () => {
   const messagesEndRef = useRef(null);
   const chatBoxRef = useRef(null);
 
-  let stompClient = null;
+  const stompClientRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,14 +42,14 @@ const ChatApp = () => {
     const backendUrl = "https://chatapp-backend-n0tc.onrender.com";
     const socket = new SockJS(`${backendUrl}/chat`);
 
-    stompClient = new Client({
+    stompClientRef.current = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       onConnect: () => {
         setConnected(true);
         console.log("Connected to backend ✅");
 
-        stompClient.subscribe("/topic/messages", (msg) => {
+        stompClientRef.current.subscribe("/topic/messages", (msg) => {
           const message = JSON.parse(msg.body);
           message.timestamp = new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -67,8 +67,8 @@ const ChatApp = () => {
       },
     });
 
-    stompClient.activate();
-    window.stompClient = stompClient;
+    stompClientRef.current.activate();
+    window.stompClient = stompClientRef.current;
   };
 
   const handleInputChange = (e) => {
@@ -134,22 +134,12 @@ const ChatApp = () => {
     return name ? name.charAt(0).toUpperCase() : "?";
   };
 
-  const getAvatarColor = (name) => {
-    const colors = [
-      "linear-gradient(135deg, #667eea, #764ba2)",
-      "linear-gradient(135deg, #f093fb, #f5576c)",
-      "linear-gradient(135deg, #4facfe, #00f2fe)",
-      "linear-gradient(135deg, #43e97b, #38f9d7)",
-      "linear-gradient(135deg, #fa709a, #fee140)",
-      "linear-gradient(135deg, #a18cd1, #fbc2eb)",
-      "linear-gradient(135deg, #ffecd2, #fcb69f)",
-      "linear-gradient(135deg, #ff9a9e, #fecfef)",
-    ];
+  const getAvatarIndex = (name) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return colors[Math.abs(hash) % colors.length];
+    return Math.abs(hash) % 8;
   };
 
   // Hero / Welcome Screen
@@ -347,12 +337,11 @@ const ChatApp = () => {
             <div
               key={i}
               className={`message-row ${isOwn ? "own" : "other"}`}
-              style={{ animationDelay: `${Math.min(i * 0.05, 0.5)}s` }}
+              style={{ "--msg-delay": `${Math.min(i * 0.05, 0.5)}s` }}
             >
               {!isOwn && (
                 <div
-                  className="message-avatar"
-                  style={{ background: getAvatarColor(msg.sender) }}
+                  className={`message-avatar avatar-color-${getAvatarIndex(msg.sender)}`}
                   title={msg.sender}
                 >
                   {getInitial(msg.sender)}
@@ -372,8 +361,7 @@ const ChatApp = () => {
               </div>
               {isOwn && (
                 <div
-                  className="message-avatar own-avatar"
-                  style={{ background: getAvatarColor(msg.sender) }}
+                  className={`message-avatar avatar-color-${getAvatarIndex(msg.sender)}`}
                   title={msg.sender}
                 >
                   {getInitial(msg.sender)}
